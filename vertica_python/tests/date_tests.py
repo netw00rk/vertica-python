@@ -1,5 +1,5 @@
 from datetime import date
-from test_commons import *
+from .test_commons import *
 from vertica_python import errors
 
 

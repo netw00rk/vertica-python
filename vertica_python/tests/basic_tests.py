@@ -1,7 +1,7 @@
 import unittest
 import logging
 
-from test_commons import conn_info
+from .test_commons import conn_info
 
 import vertica_python
 from vertica_python import errors

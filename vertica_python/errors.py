@@ -1,14 +1,11 @@
-from __future__ import absolute_import
-
-import exceptions
 import re
 
 
-class Error(exceptions.StandardError):
+class Error(Exception):
     pass
 
 
-class Warning(exceptions.StandardError):
+class Warning(Exception):
     pass
 
 

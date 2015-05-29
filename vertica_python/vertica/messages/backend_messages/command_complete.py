@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import re
 
 from struct import unpack
@@ -11,7 +9,7 @@ class CommandComplete(BackendMessage):
 
     def __init__(self, data):
 
-        data = unpack('{0}sx'.format(len(data) - 1), data)[0]
+        data = unpack('{0}sx'.format(len(data) - 1), data)[0].decode('utf-8')
 
         if re.match("INSERT", data) is not None:
             splitstr = data.split(' ', 3)

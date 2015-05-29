@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from struct import unpack
 
 from vertica_python.vertica.messages.message import BackendMessage

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import string
 
 from struct import unpack, unpack_from
@@ -15,10 +13,10 @@ class RowDescription(BackendMessage):
         field_count = unpack('!H', data[0:2])[0]
         pos = 2
 
-        for i in xrange(field_count):
-            field_info = unpack_from("!{0}sxIHIHIH".format(string.find(data, '\x00', pos) - pos), data, pos)
+        for i in range(field_count):
+            field_info = unpack_from("!{0}sxIHIHIH".format(data.find(b'\x00', pos) - pos), data, pos)
             self.fields.append({
-                'name': field_info[0],
+                'name': field_info[0].decode('utf-8', 'ignore'),
                 'table_oid': field_info[1],
                 'attribute_number': field_info[2],
                 'data_type_oid': field_info[3],

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import logging
 import select
 import socket
@@ -14,6 +12,7 @@ from vertica_python.vertica.messages.message import BackendMessage
 
 from vertica_python.vertica.cursor import Cursor
 from vertica_python.errors import SSLNotSupported
+import collections
 
 logger = logging.getLogger('vertica')
 
@@ -24,7 +23,7 @@ class Connection(object):
 
         options = options or {}
         self.options = dict(
-            (key, value) for key, value in options.iteritems() if value is not None
+            (key, value) for key, value in list(options.items()) if value is not None
         )
 
         # we only support one cursor per connection
@@ -131,15 +130,15 @@ class Connection(object):
 
     def write(self, message):
 
-        if hasattr(message, 'to_bytes') is False or callable(getattr(message, 'to_bytes')) is False:
+        if hasattr(message, 'to_bytes') is False or isinstance(getattr(message, 'to_bytes'), collections.Callable) is False:
             raise TypeError("invalid message: ({0})".format(message))
 
         logger.debug('=> %s', message)
         try:
             self._socket().sendall(message.to_bytes())
-        except Exception, e:
+        except Exception as e:
             self.close_socket()
-            raise errors.ConnectionError(e.message)
+            raise errors.ConnectionError(str(e))
 
     def close_socket(self):
         try:
@@ -160,13 +159,14 @@ class Connection(object):
         try:
             ready = select.select([self._socket()], [], [], self.options['read_timeout'])
             if len(ready[0]) > 0:
-                type = self.read_bytes(1)
+                type = self.read_bytes(1).decode('utf-8')
                 size = unpack('!I', self.read_bytes(4))[0]
 
                 if size < 4:
                     raise errors.MessageError(
                         "Bad message size: {0}".format(size)
                     )
+
                 message = BackendMessage.factory(type, self.read_bytes(size - 4))
                 logger.debug('<= %s', message)
                 return message
@@ -177,7 +177,7 @@ class Connection(object):
             raise
         except Exception as e:
             self.close_socket()
-            raise errors.ConnectionError(e.message)
+            raise errors.ConnectionError(str(e))
 
     def process_message(self, message):
         if isinstance(message, messages.ErrorResponse):
@@ -202,7 +202,7 @@ class Connection(object):
 
     def __str__(self):
         safe_options = dict(
-            (key, value) for key, value in self.options.iteritems() if key != 'password'
+            (key, value) for key, value in list(self.options.items()) if key != 'password'
         )
         s1 = "<Vertica.Connection:{0} parameters={1} backend_pid={2}, ".format(
             id(self), self.parameters, self.backend_pid
@@ -214,7 +214,7 @@ class Connection(object):
         return s1 + s2
 
     def read_bytes(self, n):
-        results = ''
+        results = b''
         while len(results) < n:
             bytes = self._socket().recv(n - len(results))
             if not bytes:
@@ -224,9 +224,9 @@ class Connection(object):
 
     def startup_connection(self):
         # This doesn't handle Unicode usernames or passwords
-        user = self.options['user'].encode('ascii')
-        database = self.options['database'].encode('ascii')
-        password = self.options['password'].encode('ascii')
+        user = self.options['user'].encode('utf-8')
+        database = self.options['database'].encode('utf-8')
+        password = self.options['password'].encode('utf-8')
 
         self.write(messages.Startup(user, database))
 

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import string
 
 from struct import unpack_from
@@ -35,12 +33,12 @@ class NoticeResponse(BackendMessage):
 
         pos = 0
         while pos < len(data) - 1:
-            null_byte = string.find(data, '\x00', pos)
+            null_byte = data.find(b'\x00', pos)
 
             # This will probably work
             unpacked = unpack_from('c{0}sx'.format(null_byte - 1 - pos), data, pos)
-            key = unpacked[0]
-            value = unpacked[1]
+            key = unpacked[0].decode('utf-8', 'ignore')
+            value = unpacked[1].decode('utf-8', 'ignore')
 
             self.values[self.FIELDS()[key]] = value
             pos += (len(value) + 2)

@@ -3,9 +3,8 @@
 [![PyPI version](https://badge.fury.io/py/vertica-python.png)](http://badge.fury.io/py/vertica-python)
 
 This is fork of https://github.com/uber/vertica-python with Python 3.4 compatibility only!
-I'll try and keep it up to date with the original one.
 
-If you find some bug or issue that is not connected with compatibility, please, submit it to original repository
+if you find some bug or an issue that is not related to compatibility, please, submit it to original repository.
 
 
 ## Installation
@@ -22,10 +21,6 @@ To install vertica-python with pip (with optional namedparams dependencies):
 
     # see 'Using named parameters' section below
     pip install 'vertica-python[namedparams]'
-
-Source code for vertica-python can be found at:
-
-    http://github.com/uber/vertica-python
 
 
 ## Run unit tests

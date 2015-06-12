@@ -55,4 +55,4 @@ class BackendMessage(Message):
 
 class FrontendMessage(Message):
     def to_bytes(self):
-        return self.message_string('')
+        return self.message_string(b'')

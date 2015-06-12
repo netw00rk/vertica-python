@@ -2,16 +2,10 @@
 
 [![PyPI version](https://badge.fury.io/py/vertica-python.png)](http://badge.fury.io/py/vertica-python)
 
-0.4.x breaks some of the older query interfaces (row_handler callback, and connection.query).
-It replaces the row_handler callback with an iterate() method. Please see examples below
+This is fork of https://github.com/uber/vertica-python with Python 3.4 compatibility only!
+I'll try and keep it up to date with the original one.
 
-If you are on 0.4.0 - 0.4.3, please upgrade to 0.4.5 as there are various bug fixes
-
-vertica-python is a native Python adapter for the Vertica (http://www.vertica.com) database.
-
-vertica-python is currently in beta stage; it has been tested for functionality and has a very basic test suite. Please use with caution, and feel free to submit issues and/or pull requests (after running the unit tests).
-
-vertica-python has been tested with Vertica 6.1.2/7.0.0+ and Python 2.6/2.7.
+If you find some bug or issue that is not connected with compatibility, please, submit it to original repository
 
 
 ## Installation

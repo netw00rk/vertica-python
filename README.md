@@ -7,22 +7,6 @@ This is fork of https://github.com/uber/vertica-python with Python 3.4 compatibi
 if you find some bug or an issue that is not related to compatibility, please, submit it to original repository.
 
 
-## Installation
-
-If you're using pip >= 1.4 and you don't already have pytz installed:
-
-    pip install --pre pytz
-
-To install vertica-python with pip:
-
-    pip install vertica-python
-
-To install vertica-python with pip (with optional namedparams dependencies):
-
-    # see 'Using named parameters' section below
-    pip install 'vertica-python[namedparams]'
-
-
 ## Run unit tests
     # install nose if you don't have it
     pip install -r requirements_test.txt
@@ -49,12 +33,12 @@ conn_info = {'host': '127.0.0.1',
              'database': 'a_database'}
 
 # simple connection, with manual close
-connection = vertica_python.connect(conn_info)
+connection = vertica_python.connect(**conn_info)
 # do things
 connection.close()
 
 # using with for auto connection closing after usage
-with vertica_python.connect(conn_info) as connection:
+with vertica_python.connect(**conn_info) as connection:
     # do things
 ```
 

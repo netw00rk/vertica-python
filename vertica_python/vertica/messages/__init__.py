@@ -34,6 +34,7 @@ from .frontend_messages.startup import Startup
 from .frontend_messages.sync import Sync
 from .frontend_messages.terminate import Terminate
 
+
 __all__ = ["Authentication", "BackendKeyData", "BindComplete", "CloseComplete", "CommandComplete",
            "CopyInResponse", "DataRow", "EmptyQueryResponse", "ErrorResponse", "NoData", "NoticeResponse",
            "ParameterDescription", "ParameterStatus", "ParseComplete", "PortalSuspended",

@@ -130,12 +130,24 @@ class Connection(object):
 
     def write(self, message):
 
-        if hasattr(message, 'to_bytes') is False or isinstance(getattr(message, 'to_bytes'), collections.Callable) is False:
+        is_stream = hasattr(message, "read_bytes")
+
+        if (hasattr(message, 'to_bytes') is False or callable(getattr(message, 'to_bytes')) is False) and not is_stream:
             raise TypeError("invalid message: ({0})".format(message))
 
         logger.debug('=> %s', message)
         try:
-            self._socket().sendall(message.to_bytes())
+            if not is_stream:
+                self._socket().sendall(message.to_bytes())
+            else:
+                # read to end in chunks
+                while True:
+                    data = message.read_bytes()
+                    if len(data) == 0:
+                        break
+
+                    self._socket().sendall(data)
+
         except Exception as e:
             self.close_socket()
             raise errors.ConnectionError(str(e))
@@ -193,6 +205,8 @@ class Connection(object):
         elif isinstance(message, messages.ReadyForQuery):
             self.transaction_status = message.transaction_status
         elif isinstance(message, messages.CommandComplete):
+            pass
+        elif isinstance(message, messages.CopyInResponse):
             pass
         else:
             raise errors.MessageError("Unhandled message: {0}".format(message))

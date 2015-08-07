@@ -4,6 +4,9 @@
 
 This is fork of https://github.com/uber/vertica-python with Python 3.4 compatibility only!
 
+0.5.x changes the connection method to accept kwargs instead of a dict to be more dbapi compliant.
+      copy methods improved and consolidated in 0.5.1
+
 if you find some bug or an issue that is not related to compatibility, please, submit it to original repository.
 
 
@@ -111,8 +114,10 @@ connection.commit()
 
 ```python
 cur = connection.cursor()
-cur.copy("COPY test_copy (id, name) from stdin DELIMITER ',' ",  "1,foo\n2,bar")
+cur.copy("COPY test_copy (id, name) from stdin DELIMITER ',' ",  csv)
 ```
+
+Where `csv` is either a string or a file-like object (specifically, any object with a `read()` method). If using a file, the data is streamed.
 
 
 ## License

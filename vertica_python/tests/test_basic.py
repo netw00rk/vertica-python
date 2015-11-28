@@ -2,7 +2,7 @@ import unittest
 import logging
 import tempfile
 
-from .test_commons import conn_info
+from vertica_python.tests.test_commons import conn_info
 
 import vertica_python
 from vertica_python import errors

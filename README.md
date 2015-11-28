@@ -1,8 +1,6 @@
 # vertica-python
 
-[![PyPI version](https://badge.fury.io/py/vertica-python.png)](http://badge.fury.io/py/vertica-python)
-
-This is fork of https://github.com/uber/vertica-python with Python 3.4 compatibility only!
+This is fork of https://github.com/uber/vertica-python with Python 3.4 and higher compatibility only!
 
 0.5.x changes the connection method to accept kwargs instead of a dict to be more dbapi compliant.
       copy methods improved and consolidated in 0.5.1
@@ -18,7 +16,7 @@ if you find some bug or an issue that is not related to compatibility, please, s
     # connection info is in tests/basic_tests.py
 
     # run tests
-    nosetests
+    nose2
 
 
 ## Usage

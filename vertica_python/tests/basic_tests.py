@@ -32,10 +32,15 @@ class TestVerticaPython(unittest.TestCase):
         
         cur.execute(""" INSERT INTO vertica_python_unit_test (a, b) VALUES (1, 'aa'); commit; """)
         cur.execute("SELECT a, b from vertica_python_unit_test WHERE a = 1")
+
+        # unknown rowcount
+        assert cur.rowcount == -1
+
         res = cur.fetchall()
         assert 1 == len(res)
         assert 1 == res[0][0]
         assert 'aa' == res[0][1]
+        assert cur.rowcount == 1
 
     def test_multi_inserts_and_transaction(self):
 
@@ -88,6 +93,30 @@ class TestVerticaPython(unittest.TestCase):
         assert 1 == len(res)
 
 
+    def test_delete(self):
+
+        conn = vertica_python.connect(**conn_info)
+        cur = conn.cursor()
+        init_table(cur)
+
+        cur.execute(""" INSERT INTO vertica_python_unit_test (a, b) VALUES (5, 'cc') """)
+        conn.commit()
+
+        cur.execute(""" DELETE from vertica_python_unit_test WHERE a = 5 """)
+
+        # validate delete count
+        assert cur.rowcount == -1
+        res = cur.fetchone()
+        assert 1 == len(res)
+        assert 1 == res[0]
+
+        conn.commit()
+
+        cur.execute("SELECT a, b from vertica_python_unit_test WHERE a = 5")
+        res = cur.fetchall()
+        assert 0 == len(res)
+
+
     def test_update(self):
 
         conn = vertica_python.connect(**conn_info)
@@ -95,9 +124,22 @@ class TestVerticaPython(unittest.TestCase):
         init_table(cur)
     
         cur.execute(""" INSERT INTO vertica_python_unit_test (a, b) VALUES (5, 'cc') """)
+
+        # validate insert count
+        res = cur.fetchone()
+        assert 1 == len(res)
+        assert 1 == res[0]
+
         conn.commit()
     
         cur.execute(""" UPDATE vertica_python_unit_test SET b = 'ff' WHERE a = 5 """)
+
+        # validate update count
+        assert cur.rowcount == -1
+        res = cur.fetchone()
+        assert 1 == len(res)
+        assert 1 == res[0]
+
         conn.commit()
     
         cur.execute("SELECT a, b from vertica_python_unit_test WHERE a = 5")
@@ -281,3 +323,89 @@ class TestVerticaPython(unittest.TestCase):
         cur.execute("SELECT a, b from vertica_python_unit_test")
         res = cur.fetchall()
         assert 1 == len(res)
+
+    # unit test for #78
+    def test_copy_with_data_in_buffer(self):
+
+        conn = vertica_python.connect(**conn_info)
+        cur = conn.cursor()
+        init_table(cur)
+
+        cur.execute("select 1;")
+        cur.fetchall()
+
+        # Current status: CommandComplete
+
+        copy_sql = """COPY vertica_python_unit_test (a, b)
+                     FROM STDIN
+                     DELIMITER '|'
+                     NULL AS 'None'"""
+
+        data = """1|name1
+        2|name2"""
+
+        cur.copy(copy_sql, data)
+        cur.execute("select 1;") # will raise QueryError here
+
+        conn.close()
+
+    # unit test for #74
+    def test_nextset(self):
+
+        conn = vertica_python.connect(**conn_info)
+        cur = conn.cursor()
+        init_table(cur)
+
+        cur.execute("select 1; select 2;")
+        res = cur.fetchall()
+
+        assert 1 == len(res)
+        assert 1 == res[0][0]
+        assert cur.fetchone() is None
+
+        assert cur.nextset() == True
+
+        res = cur.fetchall()
+        assert 1 == len(res)
+        assert 2 == res[0][0]
+        assert cur.fetchone() is None
+
+        assert cur.nextset() is None
+
+    # unit test for #74
+    def test_nextset_with_delete(self):
+
+        conn = vertica_python.connect(**conn_info)
+        cur = conn.cursor()
+        init_table(cur)
+
+        # insert data
+        cur.execute(""" INSERT INTO vertica_python_unit_test (a, b) VALUES (1, 'aa') """)
+        cur.execute(""" INSERT INTO vertica_python_unit_test (a, b) VALUES (2, 'bb') """)
+        conn.commit()
+
+        cur.execute("""select * from vertica_python_unit_test;
+                    delete from vertica_python_unit_test;
+                    select * from vertica_python_unit_test;
+                    """)
+
+        # check first select results
+        res = cur.fetchall()
+        assert 2 == len(res)
+        assert cur.fetchone() is None
+
+        # check delete results
+        assert cur.nextset() == True
+        res = cur.fetchall()
+        assert 1 == len(res)
+        assert 2 == res[0][0]
+        assert cur.fetchone() is None
+
+        # check second select results
+        assert cur.nextset() == True
+        res = cur.fetchall()
+        assert 0 == len(res)
+        assert cur.fetchone() is None
+
+        # no more data sets
+        assert cur.nextset() is None

@@ -21,6 +21,7 @@ from .frontend_messages.bind import Bind
 from .frontend_messages.cancel_request import CancelRequest
 from .frontend_messages.close import Close
 from .frontend_messages.copy_data import CopyData
+from .frontend_messages.copy_stream import CopyStream
 from .frontend_messages.copy_done import CopyDone
 from .frontend_messages.copy_fail import CopyFail
 from .frontend_messages.describe import Describe
@@ -38,7 +39,7 @@ from .frontend_messages.terminate import Terminate
 __all__ = ["Authentication", "BackendKeyData", "BindComplete", "CloseComplete", "CommandComplete",
            "CopyInResponse", "DataRow", "EmptyQueryResponse", "ErrorResponse", "NoData", "NoticeResponse",
            "ParameterDescription", "ParameterStatus", "ParseComplete", "PortalSuspended",
-           "ReadyForQuery", "RowDescription", "Unknown", "Bind", "CancelRequest", "Close", "CopyData", "CopyDone",
+           "ReadyForQuery", "RowDescription", "Unknown", "Bind", "CancelRequest", "Close", "CopyData", "CopyStream", "CopyDone",
            "CopyFail", "Describe", "Execute", "Flush", "Parse", "Password", "Query", "SslRequest", "Startup", "Sync",
            "Terminate",
            ]
